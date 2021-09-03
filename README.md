@@ -1,2 +1,7 @@
 # Bash-Scripting-Assignment
-Course: IN616 – Operating Systems Concepts, Semester 1, 2021 Otago Polytechnic
+**Name:** Kaylem Williams Sutherland </br>
+**Student ID number:** 1000050830 </br>
+**Date of last changes:** N/A </br>
+## Purpose
+## Pre-requisites
+## How to run
