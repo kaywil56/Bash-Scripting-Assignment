@@ -1,20 +1,24 @@
 #! /bin/bash
 
 processInput(){
-	if [ -z $filename ]; then
-		echo no param entered
-	else
-		if [[ ${filename:0:4} == http ]]; then
-			echo URI
-		else 
-			echo Not URI
-		fi
+	
+	if [[ ${filename:0:4} == http ]]; then
+		echo URI
+	else 
+		echo Not URI
 	fi
 }
 
 filename=$1
 
-processInput $filename
+if [ -z $filename ]; then
+	read -p "CSV file location: " filename
+	processInput $filename
+else
+	processInput $filename
+fi
+
+
 
 # IFS=";"
 
