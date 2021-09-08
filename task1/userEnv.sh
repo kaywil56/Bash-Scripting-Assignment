@@ -25,13 +25,19 @@ IFS=";"
 
 while read col1 col2 col3 col4
 do
-	firstname=${col1:0:1}
-	temp=${col1%@*}
-	lastname=${temp#*.}
-	username=$firstname$lastname
+	# Creates a username from the given email
+	firstChar=${col1:0:1}
+	stripEmail=${col1%@*}
+	lastname=${stripEmail#*.}
+	username=$firstChar$lastname
 	
-	echo $username
-	echo DOB $col2
+	# Creates a password from a given DOB
+	year=$(echo $col2 | cut -d '/' -f 1)
+	month=$(echo $col2 | cut -d '/' -f 2)
+	password=$month$year
+	
+	echo username $username
+	echo password $password
 	echo groups $col3
 	echo sharedFolder $col4
 	
