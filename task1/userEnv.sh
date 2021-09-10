@@ -5,10 +5,24 @@ processInput(){
 	if [[ ${filename:0:4} == http ]]; then
 		echo URI
         wget $filename
+		filename=${filename##*/}
 	else
         echo Not URI
         cp $filename .
 	fi
+}
+# Checks if secondary groups exist. If not they are created
+checkGroups(){
+	IFS=","
+	for value in $groups
+	do
+		grep $value /etc/group
+		if [[ $? == 0 ]]; then
+			echo $value exists
+		else
+			echo $value does not exist
+		fi
+	done
 }
 
 filename=$1
@@ -23,22 +37,37 @@ fi
 
 IFS=";"
 
-while read col1 col2 col3 col4
+echo ========== User Enviroment ==========
+
+while read email DOB groups shared
 do
 	# Creates a username from the given email
-	firstChar=${col1:0:1}
-	stripEmail=${col1%@*}
+	echo Creating username.
+	firstChar=${email:0:1}
+	stripEmail=${email%@*}
 	lastname=${stripEmail#*.}
 	username=$firstChar$lastname
+	echo username $username created.
 	
 	# Creates a password from a given DOB
-	year=$(echo $col2 | cut -d '/' -f 1)
-	month=$(echo $col2 | cut -d '/' -f 2)
+	echo Creating password...
+	year=$(echo $DOB | cut -d '/' -f 1)
+	month=$(echo $DOB | cut -d '/' -f 2)
 	password=$month$year
+	echo password $password created.
 	
-	echo username $username
-	echo password $password
-	echo groups $col3
-	echo sharedFolder $col4
+	# Checks if secondary groups exist
+	
+	checkGroups $groups
+	IFS=";"
+
+	#echo User $username created
+	#sudo useradd -d /home/$username -m -G $groups $username -m
+	
+	
+	# echo groups $groups
+	# echo sharedFolder $shared
+	
+	echo =====================================
 	
 done < $filename
