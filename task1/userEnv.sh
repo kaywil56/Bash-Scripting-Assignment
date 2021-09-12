@@ -1,6 +1,9 @@
 #! /bin/bash
 
 # Checks if input is a local file or URI
+
+clear
+
 processInput(){
 	if [[ ${filename:0:4} == http ]]; then
 		echo URI
@@ -21,6 +24,7 @@ checkGroups(){
 			echo $value exists
 		else
 			echo $value does not exist
+			sudo groupadd $value
 		fi
 	done
 }
@@ -62,7 +66,7 @@ do
 	IFS=";"
 
 	#echo User $username created
-	#sudo useradd -d /home/$username -m -G $groups $username -m
+	sudo useradd -d /home/$username -m -G $groups $username -m
 	
 	
 	# echo groups $groups
