@@ -28,6 +28,17 @@ checkGroups(){
 		fi
 	done
 }
+# Checks if shared folders exist. If not they are created
+checkSharedFolders(){
+	grep $value /etc/group
+		if [[ $? == 0 ]]; then
+			echo $shared exists
+		else
+			echo $shared does not exist
+			cd /
+			mkdir $shared
+		fi
+}
 
 filename=$1
 
@@ -39,9 +50,24 @@ else
         processInput $filename
 fi
 
-IFS=";"
+#Counts the amount of users to be created
+IFS=$'\n'
+count=0
+while read user
+do
+
+        ((count++))
+        echo $count
+
+done < $filename
+
 
 echo ========== User Enviroment ==========
+echo 
+echo Users to be created:
+echo 
+echo Do you wish to run this command? yes/no:
+read -p "> " yesorno 
 
 while read email DOB groups shared
 do
@@ -61,16 +87,14 @@ do
 	echo password $password created.
 	
 	# Checks if secondary groups exist
-	
 	checkGroups $groups
 	IFS=";"
-
-	#echo User $username created
+	
+	# Checks if shared exist
+	checkSharedFolders $shared
+	
+	#echo creates user
 	sudo useradd -d /home/$username -m -G $groups $username -m
-	
-	
-	# echo groups $groups
-	# echo sharedFolder $shared
 	
 	echo =====================================
 	
