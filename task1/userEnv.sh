@@ -7,8 +7,8 @@ processInput(){
 	if [[ ${filename:0:4} == http ]]; then
         	wget $filename
 		filename=${filename##*/}
-	else
-        	cp $filename .
+#	else
+        #	cp $filename .
 	fi
 }
 # Checks if secondary groups exist. If not they are created
@@ -24,12 +24,11 @@ checkGroups(){
 }
 # Checks if shared folders exist. If not they are created
 checkSharedFolders(){
-	cd /
+
 	find $shared 2> /dev/null 
 		if [[ $? == 1 ]]; then
 		 	sudo mkdir $shared 
 		fi
-	cd
 }
 
 filename=$1
@@ -62,15 +61,17 @@ echo
 echo Do you wish to run this command? yes/no:
 read -p ">>> " yesorno
 
-if [[ $yesorno == no ]]; then
+if [[ $yesorno != yes ]]; then
 	exit
 fi
 
 count=0
 
+echo 
+
 while read email DOB groups shared
 do
-	if [[ $count > 1 ]]; then
+	if [[ $count > 0 ]]; then
 
 		# Creates a username from the given email
 		firstChar=${email:0:1}
@@ -84,17 +85,17 @@ do
 		password=$month$year
 	
 		# Checks if secondary groups exist
-		#checkGroups $groups
+		checkGroups $groups
 		IFS=";"
 	
 		# Checks if shared exist
-		###################################################	checkSharedFolders $shared
-	
-		#echo creates user
-	#	sudo useradd -d /home/$username -m -G $groups $username -m
+		checkSharedFolders $shared
+
+		#Adds a user
+		sudo useradd -d /home/$username -m -G $groups $username -m
 	
 		#Adds password to the user
-		#sudo echo "$username:$password" | sudo chpasswd
+		sudo echo "$username:$password" | sudo chpasswd
 
         	#Summary of created user
 		echo User $username created
