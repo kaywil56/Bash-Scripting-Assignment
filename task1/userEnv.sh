@@ -19,7 +19,11 @@ checkGroups(){
 		grep $value /etc/group
 		if [[ $? == 1 ]]; then
 			sudo groupadd $value
-		fi
+			find $shared 2> /dev/null
+			if [[ $? == 0 ]]; then
+				sudo chown :$value $shared
+			fi
+		fi 
 	done
 }
 # Checks if shared folders exist. If not they are created
@@ -27,7 +31,7 @@ checkSharedFolders(){
 
 	find $shared 2> /dev/null 
 		if [[ $? == 1 ]]; then
-		 	sudo mkdir $shared 
+		 	sudo mkdir $shared	
 		fi
 }
 
@@ -84,12 +88,13 @@ do
 		month=$(echo $DOB | cut -d '/' -f 2)
 		password=$month$year
 	
-		# Checks if secondary groups exist
-		checkGroups $groups
-		IFS=";"
-	
 		# Checks if shared exist
 		checkSharedFolders $shared
+
+		#...
+		checkGroups $groups
+		IFS=";"
+
 
 		#Adds a user
 		sudo useradd -d /home/$username -m -G $groups $username -m
