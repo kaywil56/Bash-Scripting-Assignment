@@ -19,7 +19,7 @@ checkGroups(){
 		grep $value /etc/group
 		if [[ $? == 1 ]]; then
 			sudo groupadd $value
-			find $shared 2> /dev/null
+			sudo find $shared 2> /dev/null
 			if [[ $? == 0 ]]; then
 				sudo chown :$value $shared
 			fi
@@ -31,7 +31,8 @@ checkSharedFolders(){
 
 	find $shared 2> /dev/null 
 		if [[ $? == 1 ]]; then
-		 	sudo mkdir $shared	
+		 	sudo mkdir $shared
+			sudo chmod 770 $shared	
 		fi
 }
 
@@ -95,7 +96,6 @@ do
 		checkGroups $groups
 		IFS=";"
 
-
 		#Adds a user
 		sudo useradd -d /home/$username -m -G $groups $username -m
 	
@@ -110,6 +110,12 @@ do
         	echo Password: $"******"
 		echo Groups: $groups	
 		echo =====================================
+                
+		# Checks if a user has acces to a shared folder
+		if [[ ! -z $shared ]]; then
+			sudo ln -s $shared /home/$username$shared
+		fi
+
 	fi
 
 	((count++))
