@@ -18,12 +18,12 @@ checkGroups(){
 	do
 		grep $value /etc/group
 		if [[ $? == 1 ]]; then
-			sudo groupadd $value
-			sudo find $shared 2> /dev/null
+			groupadd $value
+			find $shared 2> /dev/null
 			if [[ $? == 0 ]]; then
-				sudo chown :$value $shared
+				 chown :$value $shared
 			fi
-		fi 
+		fi
 	done
 }
 # Checks if shared folders exist. If not they are created
@@ -97,10 +97,10 @@ do
 		IFS=";"
 
 		#Adds a user
-		sudo useradd -d /home/$username -m -G $groups $username -m
+		useradd -d /home/$username -m -G $groups $username -m
 	
 		#Adds password to the user
-		sudo echo "$username:$password" | sudo chpasswd
+		echo "$username:$password" | sudo chpasswd
 
         	#Summary of created user
 		echo User $username created
@@ -113,9 +113,17 @@ do
                 
 		# Checks if a user has acces to a shared folder
 		if [[ ! -z $shared ]]; then
-			sudo ln -s $shared /home/$username$shared
+			 ln -s $shared /home/$username/shared
 		fi
 
+		# Creates an alias if has sudo access
+		if [[ $groups == *"sudo" ]]; then
+			 find /home/$username/.bash_aliases 2> /dev/null
+			if [[ $? == 1 ]]; then
+				 touch /home/$username/.bash_aliases
+			fi
+			 echo "alias myls='ls -lisa'" >> /home/$username/.bash_aliases
+		fi
 	fi
 
 	((count++))
