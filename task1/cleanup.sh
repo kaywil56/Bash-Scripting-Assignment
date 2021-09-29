@@ -29,4 +29,5 @@ do
 		sudo rm -r $shared
 		sudo rm -r /home/$username
  	
+		sudo groupdel privateVisitor
 done < $filename

@@ -13,36 +13,42 @@ processInput(){
 }
 # Checks if secondary groups exist. If not they are created
 checkGroups(){
-	IFS=","
-	for value in $groups
-	do
-		grep $value /etc/group
-		if [[ $? == 1 ]]; then
-			groupadd $value
-			find $shared 2> /dev/null
-			if [[ $? == 0 ]]; then
-				 chown :$value $shared
+	if [[ ! -z $groups ]]; then
+		IFS=","
+		for value in $groups
+		do
+			grep $value /etc/group > /dev/null
+			if [[ $? == 1 ]]; then
+				groupadd $value
+				if [[ -d $shared ]]; then
+					chown :$value $shared
+				fi
+
 			fi
-		fi
-	done
+		done
+			
+	fi
 }
 # Checks if shared folders exist. If not they are created
 checkSharedFolders(){
+	
+		if [[ ! -d $shared && ! -z $shared ]]; then
+		        mkdir $shared
+			chmod 770 $shared	
+		fi	
 
-	find $shared 2> /dev/null 
-		if [[ $? == 1 ]]; then
-		 	sudo mkdir $shared
-			sudo chmod 770 $shared	
-		fi
 }
 
 filename=$1
 
 # Checks if the user the user has added a param to the executable
 if [ -z $filename ]; then
+
 		read -p "CSV file location: " filename
 		processInput $filename
+
 else
+	
                 processInput $filename
 fi
 
@@ -79,8 +85,10 @@ do
 	if [[ $count > 0 ]]; then
 
 		# Creates a username from the given email
+		
 		firstChar=${email:0:1}
 		stripEmail=${email%@*}
+		firstname=${email}
 		lastname=${stripEmail#*.}
 		username=$firstChar$lastname
 
@@ -97,32 +105,42 @@ do
 		IFS=";"
 
 		#Adds a user
-		useradd -d /home/$username -m -G $groups $username -m
+		if [[ ! -z $groups ]]; then
+			useradd -d /home/$username -m -G $groups $username -m
+		else
+			useradd -d /home/$username -m  $username -m 
+		fi
 	
 		#Adds password to the user
 		echo "$username:$password" | sudo chpasswd
+		#force acount to change password on login
+                passwd --expire $username > /dev/null
 
         	#Summary of created user
-		echo User $username created
-		echo -------------------------------------
-		echo Home directory: /home/$username
-		echo Shared folders: $shared
-        	echo Password: $"******"
-		echo Groups: $groups	
-		echo =====================================
-                
+		echo "+-----------------------------------+"
+		echo "| User $username created            |"
+		echo "+-----------------------------------+"
+		echo "| Name: $firstname $lastname        |"
+		echo "| Email: $email                     |"   
+		echo "| DOB: $DOB                         |"
+		echo "| Home directory: /home/$username   |"
+		echo "| Shared folders: $shared           |"
+        	echo "| Password: $"******"               |"
+		echo "| Groups: $groups                   |"	
+		echo "+-----------------------------------+"
 		# Checks if a user has acces to a shared folder
 		if [[ ! -z $shared ]]; then
 			 ln -s $shared /home/$username/shared
 		fi
 
 		# Creates an alias if has sudo access
-		if [[ $groups == *"sudo" ]]; then
-			 find /home/$username/.bash_aliases 2> /dev/null
-			if [[ $? == 1 ]]; then
+		if [[ $groups == *"sudo"* ]]; then
+
+			if [[ ! -f /home/$username/.bash_aliases ]]; then
 				 touch /home/$username/.bash_aliases
 			fi
-			 echo "alias myls='ls -lisa'" >> /home/$username/.bash_aliases
+
+			echo "alias myls='ls -lisa'" >> /home/$username/.bash_aliases
 		fi
 	fi
 
