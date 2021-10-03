@@ -118,15 +118,15 @@ do
 
         	#Summary of created user
 		echo "+-------------------------------------------+"
-		echo "| User $username created                    |"
+		echo "| User $username created"
 		echo "+-------------------------------------------+"
-		echo "| Name: $firstname $lastname                |"
-		echo "| Email: $email                             |"   
-		echo "| DOB: $DOB                                 |"
-		echo "| Home directory: /home/$username           |"
-		echo "| Shared folders: $shared                   |"
-		echo "| Password: $"******"                       |"
-		echo "| Groups: $groups                           |"	
+		echo "  Name: $firstname $lastname                 "
+		echo "  Email: $email                              "   
+		echo "  DOB: $DOB                                  "
+		echo "  Home directory: /home/$username            "
+		echo "  Shared folders: $shared                    "
+		echo "  Password: $"******"                        "
+		echo "  Groups: $groups                            "	
 		echo "+-------------------------------------------+"
 		# Checks if a user has acces to a shared folder
 		if [[ ! -z $shared ]]; then
