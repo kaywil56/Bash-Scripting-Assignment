@@ -20,7 +20,7 @@ checkGroups(){
 			grep $value /etc/group > /dev/null
 			if [[ $? == 1 ]]; then
 				groupadd $value
-				if [[ -d $shared ]]; then
+				if [[ -d $shared && $value != *"visitor"* ]]; then
 					chown :$value $shared
 				fi
 
@@ -110,6 +110,19 @@ do
 		else
 			useradd -d /home/$username -m  $username -m 
 		fi
+		
+		if [[ $groups == *"visitor"* && $shared == *"visitor"* ]]; then
+			grep visitorFull /etc/group > /dev/null
+			if [[ $? == 1 ]]; then
+				groupadd visitorFull
+				chown :visitorFull $shared
+			fi
+			usermod -a -G visitorFull $username
+		fi
+
+		if [[ -z $groups && ! -z $shared ]]; then
+			usermod -a -G visitorFull $username
+		fi	
 	
 		#Adds password to the user
 		echo "$username:$password" | sudo chpasswd
@@ -118,7 +131,7 @@ do
 
         	#Summary of created user
 		echo "+-------------------------------------------+"
-		echo "| User $username created"
+		echo "  User $username created"
 		echo "+-------------------------------------------+"
 		echo "  Name: $firstname $lastname                 "
 		echo "  Email: $email                              "   
@@ -127,7 +140,6 @@ do
 		echo "  Shared folders: $shared                    "
 		echo "  Password: $"******"                        "
 		echo "  Groups: $groups                            "	
-		echo "+-------------------------------------------+"
 		# Checks if a user has acces to a shared folder
 		if [[ ! -z $shared ]]; then
 			 ln -s $shared /home/$username/shared

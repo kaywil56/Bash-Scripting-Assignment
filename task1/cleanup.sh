@@ -16,7 +16,7 @@ do
 		
 		sudo userdel $username
 
-		sudo groupdel
+		sudo groupdel visitorFull
 		
 		IFS=","
         	for value in $groups
@@ -29,5 +29,4 @@ do
 		sudo rm -r $shared
 		sudo rm -r /home/$username
  	
-		sudo groupdel privateVisitor
 done < $filename
