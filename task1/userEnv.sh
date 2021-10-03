@@ -65,7 +65,7 @@ IFS=';'
 
 count=$(($count-1))
 
-echo ========== User Enviroment ==========
+echo ========= User Enviroment =========
 echo 
 echo Users to be created: $count
 echo 
