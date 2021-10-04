@@ -6,8 +6,11 @@ IFS=';'
 
 while read  email DOB groups shared 
 do
+		sudo rm log.txt
 
 		cd /
+
+
 
                 firstChar=${email:0:1}
                 stripEmail=${email%@*}
