@@ -12,7 +12,7 @@ errorCheck(){
 
 # Checks if input is a local file or URI
 processInput(){
-	if [[ ${filename:0:4} == http ]]; then
+	if [[ ${filename:0:4} == http ]]; then #Checks if input is a URL
         	wget $filename &> /dev/null
 		if [[ $? == 0 ]]; then
 			echo file downloaded.
@@ -28,7 +28,7 @@ processInput(){
 			exit 1
 		fi
 	fi
-	if [[ $filename == *".csv" ]]; then
+	if [[ $filename == *".csv" ]]; then #Checks if input is a csv file.
 		echo Valid file extension.
 	else
 		echo Invalid file exstension.
@@ -39,7 +39,7 @@ processInput(){
 checkGroups(){
 	if [[ ! -z $groups ]]; then
 		IFS=","
-		for value in $groups
+		for value in $groups #Iterates through all groups shown for each user 
 		do
 			echo Checking if $value group exist... >> $log
 			grep $value /etc/group > /dev/null
@@ -61,7 +61,7 @@ checkGroups(){
 # Checks if shared folders exist. If not they are created
 checkSharedFolders(){
 		echo Checking if $shared folder exists... >> $log
-		if [[ ! -d $shared && ! -z $shared ]]; then
+		if [[ ! -d $shared && ! -z $shared ]]; then 
 			echo Creating $shared folder... >> $log
 		        mkdir $shared
 			errorCheck $log
@@ -130,10 +130,11 @@ do
 		month=$(echo $DOB | cut -d '/' -f 2)
 		password=$month$year
 		errorCheck $log
+		
 		# Checks if shared exist
 		checkSharedFolders $shared
 
-		#...
+		# Calls check groups method
 		checkGroups $groups
 		IFS=";"
 
@@ -147,10 +148,11 @@ do
 		       errorCheck $log	
 		fi
 		
+		# Checks if a user needs to be added to a additional group
 		if [[ $groups == *"visitor"* && $shared == *"visitor"* ]]; then
 			grep visitorFull /etc/group > /dev/null
 			if [[ $? == 1 ]]; then
-				groupadd visitorFull
+				groupadd visitorFull #adds exclusive groups for visitors that have access to the visitorShared
 				chown :visitorFull $shared
 			fi
 			usermod -a -G visitorFull $username
@@ -164,10 +166,12 @@ do
 		echo Setting password for $username... >> $log
 		echo "$username:$password" | sudo chpasswd
 		errorCheck $log
+		
 		#force acount to change password on login
 		echo Forcing password change on log in for $username >> $log
                 passwd --expire $username > /dev/null
 		errorCheck $log
+		
         	#Summary of created user
 		echo "+-------------------------------------------+"
 		echo "  User $username created"
@@ -188,7 +192,7 @@ do
 		if [[ $groups == *"sudo"* ]]; then
 		echo "  Alias: myls"
 			if [[ ! -f /home/$username/.bash_aliases ]]; then
-				 touch /home/$username/.bash_aliases
+				 touch /home/$username/.bash_aliases #Creates the .bash_aliases file if it doees not exist.
 			fi
 			echo Creating alias for $username >> $log
 			echo "alias myls='ls -lisa'" >> /home/$username/.bash_aliases
