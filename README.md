@@ -64,5 +64,5 @@ You will be prompted the the following...
 * IP:
 * PORT:
 * Target directory:
-* Target username:
+* Target username: </br>
 Once you have entered the above your compressed directory will be sent the server.
